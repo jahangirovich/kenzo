@@ -2,6 +2,7 @@ package com.example.ainurbayanova.myappfortomorrow;
 
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,19 +13,27 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
+import com.example.ainurbayanova.myappfortomorrow.Model.ModelTask;
 import com.example.ainurbayanova.myappfortomorrow.Others.TabbedPage;
+import com.example.ainurbayanova.myappfortomorrow.fragments.AddingTaskDialogFragment;
+import com.example.ainurbayanova.myappfortomorrow.fragments.DoneFragment;
+import com.example.ainurbayanova.myappfortomorrow.fragments.GoalFragment;
 import com.example.ainurbayanova.myappfortomorrow.fragments.SplashFragment;
 
 import io.paperdb.Paper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AddingTaskDialogFragment.AddingTaskInterface {
     Button btn;
     EditText title;
     EditText text;
     FragmentManager fragmentManager;
     public static FloatingActionButton fab;
     PreferenceHelper preferenceHelper;
+    GoalFragment goalFragment;
+    DoneFragment doneFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +75,15 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        doneFragment = (DoneFragment) tabbedPage.getItem(TabbedPage.DONE_TASK_FRAGMENT);
+        goalFragment = (GoalFragment) tabbedPage.getItem(TabbedPage.CURRENT_TASK_FRAGMENT);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogFragment addingTaskDialogFragment = new AddingTaskDialogFragment();
+                addingTaskDialogFragment.show(fragmentManager,"AddingTaskDialogFragment");
+            }
+        });
     }
 
     public void runSplash(){
@@ -93,5 +111,16 @@ public class MainActivity extends AppCompatActivity {
         item.setChecked(!item.isChecked());
         preferenceHelper.putBoolean(PreferenceHelper.SPLASH_IS_INVISIBLE,item.isChecked());
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onTaskAdded(ModelTask modelTask) {
+        goalFragment.addTask(modelTask);
+
+    }
+
+    @Override
+    public void onTaskAddingCancel() {
+        Toast.makeText(this,"Good By",Toast.LENGTH_SHORT).show();
     }
 }
